@@ -47,5 +47,4 @@ int main()
     setValue(&marks); 
     delet(&marks, 3); 
     show(&marks); 
-    return 0;
 }
