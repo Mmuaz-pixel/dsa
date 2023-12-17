@@ -3,13 +3,47 @@
 #include <limits.h>
 #include <time.h>
 
+using namespace std; 
+
 // Data structure to store grades
 struct Grade
 {
-    std::string studentName;
-    std::string courseName;
+    string studentName;
+    string courseName;
     int grade;
 };
+// Partition function for quicksort
+int partition(Grade arr[], int low, int high)
+{
+    int pivot = arr[high].grade;
+    int i = low - 1;
+
+    for (int j = low; j <= high - 1; j++)
+    {
+        if (arr[j].grade >= pivot)
+        {
+            i++;
+            swap(arr[i], arr[j]);
+        }
+    }
+
+    swap(arr[i + 1], arr[high]);
+    return i + 1;
+}
+
+void quicksort(Grade arr[], int low, int high)
+{
+    if (low < high)
+    {
+        // Partition the array
+        int pivot = partition(arr, low, high);
+
+        // Recursively sort the subarrays
+        quicksort(arr, low, pivot - 1);
+        quicksort(arr, pivot + 1, high);
+    }
+}
+
 
 // Function to compare grades for sorting
 bool compareGrades(const Grade &a, const Grade &b)
@@ -25,12 +59,12 @@ void mergeGradeLists(Grade mergedList[], Grade sortedLists[][40], int numCourses
     // Merge sorted lists
     for (int i = 0; i < numCourses; ++i)
     {
-        std::copy(sortedLists[i], sortedLists[i] + courseSize[i], mergedList + mergedIndex);
+        copy(sortedLists[i], sortedLists[i] + courseSize[i], mergedList + mergedIndex);
         mergedIndex += courseSize[i];
     }
 
     // Sort the merged list based on grades
-    std::sort(mergedList, mergedList + mergedIndex, compareGrades);
+    sort(mergedList, mergedList + mergedIndex, compareGrades); // using intro sort (default sorting algo)
 }
 
 // Function to generate a random grade between 50 and 100
@@ -40,11 +74,11 @@ int generateRandomGrade()
 }
 
 // Function to fill the grade list with random data
-void fillGradeList(Grade gradeList[], const std::string &courseName, int numStudents)
+void fillGradeList(Grade gradeList[], const string &courseName, int numStudents)
 {
     for (int i = 0; i < numStudents; ++i)
     {
-        gradeList[i].studentName = "Student" + std::to_string(i + 1);
+        gradeList[i].studentName = "Student" + to_string(i + 1);
         gradeList[i].courseName = courseName;
         gradeList[i].grade = generateRandomGrade();
     }
@@ -59,10 +93,10 @@ int calculateMinimumCostTrip(int cost[], int n)
     // Dynamic programming to calculate minimum cost
     for (int i = 1; i < n; ++i)
     {
-        dp[i] = INT_MAX;
+        dp[i] = INT_MAX; // infinity 
         for (int j = 0; j < i; ++j)
         {
-            dp[i] = std::min(dp[i], dp[j] + abs(i - j) * cost[i]);
+            dp[i] = min(dp[i], dp[j] + abs(i - j) * cost[i]); // finding shortest path
         }
     }
 
@@ -77,11 +111,11 @@ int main()
     const int maxStudentsPerCourse = 40;
 
     // Seed for random number generation
-    std::srand(time(0));
+    srand(time(0));
 
     Grade gradeLists[numCourses][maxStudentsPerCourse];
 
-    int courseSize[numCourses] = {40,40,40}; 
+    int courseSize[numCourses] = {40, 40, 40};
 
     // Filling grades for each course
     for (int i = 0; i < numCourses; ++i)
@@ -92,7 +126,7 @@ int main()
     // Sort each individual list of grades
     for (int i = 0; i < numCourses; ++i)
     {
-        std::sort(gradeLists[i], gradeLists[i] + courseSize[i], compareGrades);
+        quicksort(gradeLists[i], 0, courseSize[i]-1); // using quicksort for sorting 
     }
 
     // Merge all lists
@@ -101,16 +135,16 @@ int main()
     mergeGradeLists(mergedList, gradeLists, numCourses, courseSize);
 
     // Display the merged list
-    std::cout << "Merged List (Student Name, Course Name, Grade):\n";
+    cout << "Merged List (Student Name, Course Name, Grade):\n";
     for (int i = 0; i < totalStudents; ++i)
     {
-        std::cout << mergedList[i].studentName << ", " << mergedList[i].courseName << ", " << mergedList[i].grade << "\n";
+        cout << mergedList[i].studentName << ", " << mergedList[i].courseName << ", " << mergedList[i].grade << "\n";
     }
 
     // Implement the second part of the lab task - Minimum Cost Trip
-    int cityCost[] = {2, 3, 1, 4}; // Replace with your own cost data
+    int cityCost[] = {150, 300, 190, 210, 170};  // cost data
     int minCost = calculateMinimumCostTrip(cityCost, sizeof(cityCost) / sizeof(cityCost[0]));
-    std::cout << "Minimum Cost to Travel: $" << minCost << "\n";
+    cout << "Minimum Cost to Travel: $" << minCost << "\n";
 
     return 0;
 }
