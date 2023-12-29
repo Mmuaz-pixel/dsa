@@ -109,6 +109,74 @@ struct Node *insertion(Node *root, int value)
     return root;
 }
 
+struct Node *deleteNode(Node *root, int value)
+{
+    if (root == NULL)
+        return root;
+
+    if (value < root->data)
+        root->left = deleteNode(root->left, value);
+    else if (value > root->data)
+        root->right = deleteNode(root->right, value);
+    else
+    {
+        // Node with only one child or no child
+        if (root->left == NULL)
+        {
+            struct Node *temp = root->right;
+            delete root;
+            return temp;
+        }
+        else if (root->right == NULL)
+        {
+            struct Node *temp = root->left;
+            delete root;
+            return temp;
+        }
+
+        // Node with two children, get the inorder successor
+        struct Node *temp = root->right;
+        while (temp->left != NULL)
+            temp = temp->left;
+
+        // Copy the inorder successor's data to this node
+        root->data = temp->data;
+
+        // Delete the inorder successor
+        root->right = deleteNode(root->right, temp->data);
+    }
+
+    // Update height of the current node
+    root->height = 1 + max(root->left->getHeight(), root->right->getHeight());
+
+    // Get the balance factor of this node
+    int balance_factor = root->getBalanceFactor();
+
+    // Left Left Case
+    if (balance_factor > 1 && root->left->getBalanceFactor() >= 0)
+        return rightRotate(root);
+
+    // Left Right Case
+    if (balance_factor > 1 && root->left->getBalanceFactor() < 0)
+    {
+        root->left = leftRotate(root->left);
+        return rightRotate(root);
+    }
+
+    // Right Right Case
+    if (balance_factor < -1 && root->right->getBalanceFactor() <= 0)
+        return leftRotate(root);
+
+    // Right Left Case
+    if (balance_factor < -1 && root->right->getBalanceFactor() > 0)
+    {
+        root->right = rightRotate(root->right);
+        return leftRotate(root);
+    }
+
+    return root;
+}
+
 int main()
 {
     //       5 
