@@ -1,76 +1,105 @@
 #include <iostream>
 using namespace std;
 
-class Queue {
+class CircularQueue {
+private:
     int *arr;
-    int front;
-    int rear;
-    int size;
+    int front, rear, capacity, size;
 
 public:
-    Queue(int size) {
-        this->size = size;
-        arr = new int[size];
-        front = -1;
-        rear = -1;
+    CircularQueue(int cap) {
+        capacity = cap;
+        arr = new int[capacity];
+        front = rear = -1;
+        size = 0;
+    }
+
+    ~CircularQueue() {
+        delete[] arr;
     }
 
     bool isEmpty() {
-        return front == -1;
+        return size == 0;
     }
 
     bool isFull() {
-        return (rear == size - 1);
+        return size == capacity;
     }
 
-    void enque(int data) {
-        if (!isFull()) {
-            if (isEmpty())
-                front = 0;
-            arr[++rear] = data;
+    void enqueue(int item) {
+        if (isFull()) {
+            cout << "Queue is full. Cannot enqueue.\n";
+            return;
         }
-        else {
-            cout << "Queue is full. Cannot enqueue." << endl;
+
+        if (isEmpty()) {
+            front = rear = 0;
+        } else {
+            rear = (rear + 1) % capacity;
         }
+
+        arr[rear] = item;
+        size++;
+
+        cout << "Enqueued: " << item << endl;
     }
 
-    int deque() {
-        if (!isEmpty()) {
-            int data = arr[front];
-            if (front == rear) {
-                front = -1;
-                rear = -1;
-            }
-            else {
-                front++;
-            }
-            return data;
+    void dequeue() {
+        if (isEmpty()) {
+            cout << "Queue is empty. Cannot dequeue.\n";
+            return;
         }
-        else {
-            cout << "Queue is empty. Cannot dequeue." << endl;
-            return -1; // You can choose a different way to handle this case.
+
+        cout << "Dequeued: " << arr[front] << endl;
+
+        if (front == rear) {
+            // If the queue becomes empty after dequeue
+            front = rear = -1;
+        } else {
+            front = (front + 1) % capacity;
         }
+
+        size--;
     }
 
-    ~Queue() {
-        delete[] arr;
+    int getFront() {
+        if (isEmpty()) {
+            cout << "Queue is empty. No front element.\n";
+            return -1;
+        }
+
+        return arr[front];
+    }
+
+    int getRear() {
+        if (isEmpty()) {
+            cout << "Queue is empty. No rear element.\n";
+            return -1;
+        }
+
+        return arr[rear];
     }
 };
 
-int main()
-{
-    Queue Q1(3); 
-    Q1.enque(1); 
-    Q1.enque(2); 
-    Q1.enque(3);
+int main() {
+    CircularQueue cq(5);
 
-    cout << Q1.deque() << "\n";  
-    Q1.enque(4);
-    cout << Q1.deque() << " \n";  
-    Q1.enque(5);
-    cout << Q1.deque() << " \n";
-    cout << Q1.deque() << " \n";
-    cout << Q1.deque() << " \n";
+    cq.enqueue(1);
+    cq.enqueue(2);
+    cq.enqueue(3);
+    cq.enqueue(4);
+
+    cout << "Front: " << cq.getFront() << endl;
+    cout << "Rear: " << cq.getRear() << endl;
+
+    cq.dequeue();
+    cq.dequeue();
+
+    cq.enqueue(5);
+    cq.enqueue(6);
+
+    cout << "Front: " << cq.getFront() << endl;
+    cout << "Rear: " << cq.getRear() << endl;
 
     return 0;
 }
