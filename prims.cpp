@@ -12,7 +12,6 @@ int findMinKey(int key[], bool mstSet[], int vertices) {
             minIndex = v;
         }
     }
-
     return minIndex;
 }
 
